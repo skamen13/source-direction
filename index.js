@@ -3,6 +3,17 @@ const path = require('path');
 const app = express();
 const axios = require("axios");
 const WebSocket = require('ws');
+
+// Маршрут для отображения карты
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Запуск сервера на порте 3000
+app.listen(3000, () => {
+    console.log('Сервер запущен на порте 3000!');
+});
+
 const wss = new WebSocket.Server({ port: 1820 }); // Порт вашего сервера
 
 // Установка директории с файлами стилей и скриптов Leaflet
@@ -45,14 +56,4 @@ wss.on('connection', function connection(ws) {
             console.error('Ошибка:', error);
         }
     });
-});
-
-// Маршрут для отображения карты
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Запуск сервера на порте 3000
-app.listen(3000, () => {
-    console.log('Сервер запущен на порте 3000!');
 });
