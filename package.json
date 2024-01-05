@@ -1,0 +1,23 @@
+{
+  "name": "navigator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/text-to-speech": "^5.0.1",
+    "@googlemaps/google-maps-services-js": "^3.3.42",
+    "axios": "^1.6.4",
+    "express": "^4.18.2",
+    "leaflet": "^1.9.4",
+    "openrouteservice": "^0.1.2",
+    "osrm-client": "^0.0.9",
+    "say": "^0.16.0",
+    "ws": "^8.16.0"
+  }
+}

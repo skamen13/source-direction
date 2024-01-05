@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OpenStreetMap Navigator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        #map {
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+<div id="instruction" data-text="Текст инструкции"></div>
+<script src="index.js"></script>
+<script>
+    const map = L.map('map').setView([0, 0], 13); // Начальные координаты (будут обновлены)
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+    }).addTo(map);
+
+    // Проверка доступности геолокации в браузере
+    let control = null;
+
+    let lastInstruction = '';
+
+    function updateRoute() {
+        if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const {latitude, longitude} = position.coords;
+                    console.log(latitude, longitude);
+
+
+                    if (control) {
+                        map.removeControl(control); // Удаление предыдущего маршрута
+                    }
+                    control = L.Routing.control({
+                        waypoints: [
+                            L.latLng(latitude - 0.03567736655971, longitude - 0.01740386176932), // Геолокация клиента как начальная точка
+                            L.latLng(45.02604229759043, 38.99342115969843), // Конечная точка (можно изменить координаты)
+                        ],
+                        routeWhileDragging: true,
+                        instructions: true, // Включаем инструкции по маршруту
+                        language: 'ru', // Язык инструкций
+                        profile: 'foot',
+                    }).addTo(map);
+                    control.on('routesfound', function (e) {
+                        const routes = e.routes;
+                        const route = routes[0];
+                            const instructions = route.instructions;
+
+                            if (instructions[0].text != lastInstruction)
+                            {
+                                console.log(instructions[0].text)
+                                speakText(instructions[0].text);
+                                lastInstruction = instructions[0].text;
+                            }
+
+
+                    });
+                },
+                (error) => {
+                    console.error('Ошибка геолокации:', error);
+                }
+            );
+        } else {
+            console.error('Геолокация недоступна');
+        }
+    }
+
+    updateRoute(); // Первоначальное создание маршрута
+
+    function speakText(text) {
+        const socket = new WebSocket('ws://localhost:1820'); // Адрес вашего сервера
+
+        socket.onopen = function () {
+            // Событие при установлении соединения
+            socket.send(text);
+        };
+
+        socket.onmessage = function (out) {
+            const utterance = new SpeechSynthesisUtterance(out.data);
+            speechSynthesis.speak(utterance);
+        };
+    }
+
+    setInterval(updateRoute, 5000); // Обновление маршрута каждые 5 секунд
+</script>
+
+</body>
+</html>
