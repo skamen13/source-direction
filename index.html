@@ -85,7 +85,7 @@
     updateRoute(); // Первоначальное создание маршрута
 
     function speakText(text) {
-        const socket = new WebSocket('ws://localhost:3000'); // Адрес вашего сервера
+        const socket = new WebSocket('ws://source-direction.onrender.com:3000'); // Адрес вашего сервера
 
         socket.onopen = function () {
             // Событие при установлении соединения
